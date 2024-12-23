@@ -29,13 +29,6 @@ public:
         delete[] m_data;
     }
 
-    // Accessor for element
-    T& at(int row, int col) {
-        if (row >= rows || col >= cols || row < 0 || col < 0)
-            std::cout << "Out of range" << std::endl;
-        return m_data[row][col];
-    }
-
     int getRows() const { return rows; }
 
     // Getter for columns
@@ -44,7 +37,7 @@ public:
     // Getter for data
     T** getData() const { return m_data; }
 
-    // Getter for value (constant access)
+    // Getter for value
     T getVal(int i, int j) const {
         // Check if indices are within range
         if (i >= rows || j >= cols || i < 0 || j < 0)
