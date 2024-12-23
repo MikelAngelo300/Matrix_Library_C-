@@ -5,23 +5,23 @@ template<typename T>
 class Matrix {
 private:
     int rows, cols;
-    T** m_data; // Wskaźnik do dynamicznej tablicy dwuwymiarowej
+    T** m_data; // Pointer to the dynamically allocated 2D array
 
 public:
-    // Konstruktor
+    // Constructor
     Matrix(int rows, int cols, T initValue = T())
         : rows(rows), cols(cols) {
-        // Dynamiczna alokacja pamięci
+        // Dynamic memory allocation
         m_data = new T*[rows];
         for (int i = 0; i < rows; ++i) {
             m_data[i] = new T[cols];
             for (int j = 0; j < cols; ++j) {
-                m_data[i][j] = initValue; // Inicjalizujemy wartością domyślną
+                m_data[i][j] = initValue; // Initialize with default value
             }
         }
     }
 
-    // Destruktor (zwalnia pamięć)
+    // Destructor (frees memory)
     ~Matrix() {
         for (int i = 0; i < rows; ++i) {
             delete[] m_data[i];
@@ -29,48 +29,49 @@ public:
         delete[] m_data;
     }
 
-    // Dostęp do elementu
+    // Accessor for element
     T& at(int row, int col) {
         if (row >= rows || col >= cols || row < 0 || col < 0)
-            std::cout<<"Out of range"<< std::endl;
+            std::cout << "Out of range" << std::endl;
         return m_data[row][col];
     }
 
     int getRows() const { return rows; }
 
-    // Getter dla cols
+    // Getter for columns
     int getCols() const { return cols; }
 
-    // Getter dla danych
+    // Getter for data
     T** getData() const { return m_data; }
 
-    // Getter dla wartości (stały dostęp)
+    // Getter for value (constant access)
     T getVal(int i, int j) const {
-        // Sprawdzamy, czy indeksy są w zakresie
+        // Check if indices are within range
         if (i >= rows || j >= cols || i < 0 || j < 0)
             std::cout << "Out of range" << std::endl;
-        return m_data[i][j];  // Zmieniono na typ T
+        return m_data[i][j];  // Changed to type T
     }
 
-    // Setter dla wartości
+    // Setter for value
     void setVal(int i, int j, T newVal) {
         if (i >= rows || j >= cols || i < 0 || j < 0)
             std::cout << "Out of range" << std::endl;
-        m_data[i][j] = newVal;  // Zmieniono na typ
+        m_data[i][j] = newVal;  // Changed to type T
     }
 
-    template<typename U> // Deklaracja jako szablon
+    template<typename U> // Declaration as a template
     friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& M);
 
 };
 
+// Operator << for printing the matrix
 template<typename U>
 std::ostream& operator<<(std::ostream& os, const Matrix<U>& M) {
-    for (int i = 0; i < M.getRows(); ++i) {      // Pętla po wierszach
-        for (int j = 0; j < M.getCols(); ++j) {  // Pętla po kolumnach
-            os << M.getData()[i][j] << " ";      // Wyświetlanie elementu
+    for (int i = 0; i < M.getRows(); ++i) {      // Loop through rows
+        for (int j = 0; j < M.getCols(); ++j) {  // Loop through columns
+            os << M.getData()[i][j] << " ";      // Displaying element
         }
-        os << std::endl;  // Nowa linia po każdym wierszu
+        os << std::endl;  // New line after each row
     }
-    return os;  // Zwracamy strumień, aby umożliwić dalsze operacje na strumieniu
+    return os;  // Return the stream to allow further operations on the stream
 }
