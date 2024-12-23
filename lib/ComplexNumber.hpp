@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 
 class ComplexNumber {
 private:
@@ -93,8 +94,10 @@ public:
     return *this;
 }
     
-     friend std::ostream& operator<<(std::ostream& os, const ComplexNumber& c) {
-        os << c.m_real << (c.m_imag >= 0 ? " + " : " - ") << std::abs(c.m_imag) << "i";
+    friend std::ostream& operator<<(std::ostream& os, const ComplexNumber& c) {
+        os << c.m_real 
+           << (c.m_imag >= 0 ? " + " : " - ") 
+           << std::abs(c.m_imag) << "i";
         return os;
     }
 
