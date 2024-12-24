@@ -1,75 +1,75 @@
-#include <iostream>
-#include "src/Matrix.hpp"         // Include the Matrix class file
-
+#include "src/"
+// Function to test Matrix class with complex numbers
 int main() {
-    // Create two ComplexNumber objects for testing
-    ComplexNumber c1(1.0, 2.0); // 1 + 2i
-    ComplexNumber c2(3.0, 4.0); // 3 + 4i
+    try {
+        // Create a 2x2 matrix of ComplexNumber objects
+        rm::Matrix<ComplexNumber> mat1(2, 2, ComplexNumber(1, 2));  // Constructor with default value
+        std::cout << "Matrix 1 (initialized with Complex(1,2)):\n" << mat1 << std::endl;
 
-    // 1. Matrix creation using default constructor
-    rm::Matrix<ComplexNumber> matrix1(2, 2);
-    matrix1.setVal(0, 0, c1);
-    matrix1.setVal(0, 1, c2);
-    matrix1.setVal(1, 0, ComplexNumber(5.0, 6.0));
-    matrix1.setVal(1, 1, ComplexNumber(7.0, 8.0));
+        // Use randomFill to fill the matrix with random values (real numbers here)
+        mat1.randomFill(1, 5);
+        std::cout << "Matrix 1 after random fill:\n" << mat1 << std::endl;
 
-    std::cout << "Matrix1 (after setting values):\n" << matrix1 << std::endl;
+        // Create another matrix with complex numbers directly
+        rm::Matrix<ComplexNumber> mat2(2, 2, { { ComplexNumber(1, 1), ComplexNumber(2, 2) },
+                                               { ComplexNumber(3, 3), ComplexNumber(4, 4) } });
+        std::cout << "Matrix 2 (initialized with Complex numbers):\n" << mat2 << std::endl;
 
-    // 2. Test Matrix creation using initializer list
-    rm::Matrix<ComplexNumber> matrix2(2, 2, {{ComplexNumber(1, 1), ComplexNumber(2, 2)}, {ComplexNumber(3, 3), ComplexNumber(4, 4)}});
-    std::cout << "Matrix2 (created with initializer list):\n" << matrix2 << std::endl;
+        // Matrix addition
+        auto matAdd = mat1 + mat2;
+        std::cout << "Matrix 1 + Matrix 2:\n" << matAdd << std::endl;
 
-    // 3. Test matrix getVal and setVal methods
-    std::cout << "Element at (0, 0) of matrix1: " << matrix1.getVal(0, 0) << std::endl;
-    std::cout << "Element at (1, 1) of matrix1: " << matrix1.getVal(1, 1) << std::endl;
+        // Matrix subtraction
+        auto matSub = mat1 - mat2;
+        std::cout << "Matrix 1 - Matrix 2:\n" << matSub << std::endl;
 
-    // 4. Test matrix fill method
-    matrix2.fill(ComplexNumber(0, 0)); // Fill matrix2 with 0 + 0i
-    std::cout << "Matrix2 (after fill with 0):\n" << matrix2 << std::endl;
+        // Matrix multiplication
+        auto matMul = mat1 * mat2;
+        std::cout << "Matrix 1 * Matrix 2:\n" << matMul << std::endl;
 
-    // 5. Test randomFill method
-    matrix1.randomFill(1, 10); // Fill matrix1 with random complex numbers within range [1, 10]
-    std::cout << "Matrix1 (after random fill):\n" << matrix1 << std::endl;
+        // Matrix addition assignment
+        mat1 += mat2;
+        std::cout << "Matrix 1 after Matrix 1 += Matrix 2:\n" << mat1 << std::endl;
 
-    // 6. Test matrix addition
-    rm::Matrix<ComplexNumber> matrixAdd = matrix1 + matrix2;
-    std::cout << "Matrix1 + Matrix2:\n" << matrixAdd << std::endl;
+        // Matrix subtraction assignment
+        mat1 -= mat2;
+        std::cout << "Matrix 1 after Matrix 1 -= Matrix 2:\n" << mat1 << std::endl;
 
-    // 7. Test matrix subtraction
-    rm::Matrix<ComplexNumber> matrixSub = matrix1 - matrix2;
-    std::cout << "Matrix1 - Matrix2:\n" << matrixSub << std::endl;
+        // Matrix multiplication assignment
+        mat1 *= mat2;
+        std::cout << "Matrix 1 after Matrix 1 *= Matrix 2:\n" << mat1 << std::endl;
 
-    // 8. Test matrix multiplication
-    rm::Matrix<ComplexNumber> matrixMul = matrix1 * matrix2;
-    std::cout << "Matrix1 * Matrix2:\n" << matrixMul << std::endl;
+        // Test the equality operator (it should not be equal after multiplication)
+        std::cout << "Matrix 1 == Matrix 2: " << (mat1 == mat2 ? "True" : "False") << std::endl;
 
-    // 9. Test matrix equality
-    rm::Matrix<ComplexNumber> matrixEqual(2, 2);
-    matrixEqual.setVal(0, 0, ComplexNumber(1, 1));
-    matrixEqual.setVal(0, 1, ComplexNumber(2, 2));
-    matrixEqual.setVal(1, 0, ComplexNumber(3, 3));
-    matrixEqual.setVal(1, 1, ComplexNumber(4, 4));
+        // Test the inequality operator
+        std::cout << "Matrix 1 != Matrix 2: " << (mat1 != mat2 ? "True" : "False") << std::endl;
 
-    if (matrix2 == matrixEqual) {
-        std::cout << "Matrix2 and MatrixEqual are equal.\n";
-    } else {
-        std::cout << "Matrix2 and MatrixEqual are not equal.\n";
+        // Test setting and getting individual values
+        mat1.setVal(0, 0, ComplexNumber(10, 10));
+        std::cout << "Matrix 1 after setting (0, 0) to Complex(10,10):\n" << mat1 << std::endl;
+        ComplexNumber value = mat1.getVal(0, 0);
+        std::cout << "Matrix 1[0][0] = " << value << std::endl;
+
+        // Test the copy constructor
+        rm::Matrix<ComplexNumber> mat3(mat2); // Copy constructor
+        std::cout << "Matrix 3 (copy of Matrix 2):\n" << mat3 << std::endl;
+
+        // Test the assignment operator
+        rm::Matrix<ComplexNumber> mat4(2, 2);
+        mat4 = mat1; // Assignment operator
+        std::cout << "Matrix 4 (assigned from Matrix 1):\n" << mat4 << std::endl;
+
+        // Test destructor by creating a large matrix
+        {
+            rm::Matrix<int> largeMat(100, 100);
+            largeMat.randomFill(1, 10);
+            std::cout << "Large matrix created and filled." << std::endl;
+        } // Destructor will be called here when going out of scope
+
+    } catch (const std::exception& e) {
+        std::cout << "Caught exception: " << e.what() << std::endl;
     }
-
-    // 10. Test matrix inequality
-    if (matrix1 != matrix2) {
-        std::cout << "Matrix1 and Matrix2 are not equal.\n";
-    } else {
-        std::cout << "Matrix1 and Matrix2 are equal.\n";
-    }
-
-    // 11. Test assignment operator
-    rm::Matrix<ComplexNumber> matrixAssign = matrix1;
-    std::cout << "MatrixAssign (after assignment from Matrix1):\n" << matrixAssign << std::endl;
-
-    // 12. Test matrix multiplication assignment
-    matrix1 *= matrix2;
-    std::cout << "Matrix1 (after multiplication assignment with Matrix2):\n" << matrix1 << std::endl;
 
     return 0;
 }

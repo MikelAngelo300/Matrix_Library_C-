@@ -1,5 +1,4 @@
 #include "../lib/ComplexNumber.hpp"
-#include <iostream>
 #include <stdexcept>
 #include <cstdlib>
 #include <ctime>
