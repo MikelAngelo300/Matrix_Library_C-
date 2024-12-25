@@ -1,74 +1,122 @@
-#include "src/Matrix.hpp"
-// Function to test Matrix class with complex numbers
+#include "src/SquareMatrix.hpp"
+#include <iostream>
+
 int main() {
     try {
-        // Create a 2x2 matrix of ComplexNumber objects
-        rm::Matrix<ComplexNumber> mat1(2, 2, ComplexNumber(1, 2));  // Constructor with default value
-        std::cout << "Matrix 1 (initialized with Complex(1,2)):\n" << mat1 << std::endl;
+        // Matrix initialization with default values
+        rm::Matrix<int> m1(3, 3, 0); // 3x3 matrix filled with 0
+        std::cout << "Matrix m1 initialized with zeros:\n" << m1;
 
-        // Use randomFill to fill the matrix with random values (real numbers here)
-        mat1.randomFill(1, 5);
-        std::cout << "Matrix 1 after random fill:\n" << mat1 << std::endl;
+        // Matrix initialization with specific values
+        rm::Matrix<int> m2(2, 2, {{1, 2}, {3, 4}});
+        std::cout << "Matrix m2 initialized with values {{1, 2}, {3, 4}}:\n" << m2;
 
-        // Create another matrix with complex numbers directly
-        rm::Matrix<ComplexNumber> mat2(2, 2, { { ComplexNumber(1, 1), ComplexNumber(2, 2) },
-                                               { ComplexNumber(3, 3), ComplexNumber(4, 4) } });
-        std::cout << "Matrix 2 (initialized with Complex numbers):\n" << mat2 << std::endl;
+        // Matrix copy constructor
+        rm::Matrix<int> m3 = m2;
+        std::cout << "Matrix m3 copied from m2:\n" << m3;
+
+        // Matrix fill with specific value
+        m1.fill(5);
+        std::cout << "Matrix m1 after fill(5):\n" << m1;
+
+        // Matrix random fill
+        m1.randomFill(1, 10);
+        std::cout << "Matrix m1 after randomFill(1, 10):\n" << m1;
+
+        // Matrix random fill with Gaussian distribution
+        m1.randomFillGaussian(0, 1);
+        std::cout << "Matrix m1 after randomFillGaussian(0, 1):\n" << m1;
+
+        // Matrix sum and mean
+        std::cout << "Matrix m1 sum: " << m1.sum() << "\n";
+        std::cout << "Matrix m1 mean: " << m1.mean() << "\n";
+
+        // Matrix min and max
+        std::cout << "Matrix m1 min: " << m1.min() << "\n";
+        std::cout << "Matrix m1 max: " << m1.max() << "\n";
+
+        // Matrix normalize
+        m1.normalize();
+        std::cout << "Matrix m1 after normalization:\n" << m1;
+
+        // Matrix transpose
+        rm::Matrix<int> m4 = m1.transpose();
+        std::cout << "Matrix m4 (transpose of m1):\n" << m4;
+
+        // Matrix rotation (90, 180, 270 degrees)
+        rm::Matrix<int> m5 = m1.rotate90();
+        std::cout << "Matrix m5 after rotate90:\n" << m5;
+        rm::Matrix<int> m6 = m1.rotate180();
+        std::cout << "Matrix m6 after rotate180:\n" << m6;
+        rm::Matrix<int> m7 = m1.rotate270();
+        std::cout << "Matrix m7 after rotate270:\n" << m7;
 
         // Matrix addition
-        auto matAdd = mat1 + mat2;
-        std::cout << "Matrix 1 + Matrix 2:\n" << matAdd << std::endl;
+        rm::Matrix<int> m8 = m1 + m2;
+        std::cout << "Matrix m8 after m1 + m2:\n" << m8;
 
         // Matrix subtraction
-        auto matSub = mat1 - mat2;
-        std::cout << "Matrix 1 - Matrix 2:\n" << matSub << std::endl;
+        rm::Matrix<int> m9 = m1 - m2;
+        std::cout << "Matrix m9 after m1 - m2:\n" << m9;
 
         // Matrix multiplication
-        auto matMul = mat1 * mat2;
-        std::cout << "Matrix 1 * Matrix 2:\n" << matMul << std::endl;
+        rm::Matrix<int> m10 = m1 * m2;
+        std::cout << "Matrix m10 after m1 * m2:\n" << m10;
 
-        // Matrix addition assignment
-        mat1 += mat2;
-        std::cout << "Matrix 1 after Matrix 1 += Matrix 2:\n" << mat1 << std::endl;
+        // Matrix scaling
+        m1.scale(2);
+        std::cout << "Matrix m1 after scaling by 2:\n" << m1;
 
-        // Matrix subtraction assignment
-        mat1 -= mat2;
-        std::cout << "Matrix 1 after Matrix 1 -= Matrix 2:\n" << mat1 << std::endl;
+        // Matrix resizing
+        m1.resize(4, 4, 1);
+        std::cout << "Matrix m1 after resizing to 4x4:\n" << m1;
 
-        // Matrix multiplication assignment
-        mat1 *= mat2;
-        std::cout << "Matrix 1 after Matrix 1 *= Matrix 2:\n" << mat1 << std::endl;
+        // Submatrix
+        rm::Matrix<int> subM = m1.subMatrix(1, 1, 2, 2);
+        std::cout << "Submatrix of m1 (starting at (1,1) with size 2x2):\n" << subM;
 
-        // Test the equality operator (it should not be equal after multiplication)
-        std::cout << "Matrix 1 == Matrix 2: " << (mat1 == mat2 ? "True" : "False") << std::endl;
+        // Add row to matrix
+        m1.addRow(2, {1, 2, 3, 4});
+        std::cout << "Matrix m1 after adding row at position 2:\n" << m1;
 
-        // Test the inequality operator
-        std::cout << "Matrix 1 != Matrix 2: " << (mat1 != mat2 ? "True" : "False") << std::endl;
+        // Add column to matrix
+        m1.addCol(3, {5, 6, 7, 8});
+        std::cout << "Matrix m1 after adding column at position 3:\n" << m1;
 
-        // Test setting and getting individual values
-        mat1.setVal(0, 0, ComplexNumber(10, 10));
-        std::cout << "Matrix 1 after setting (0, 0) to Complex(10,10):\n" << mat1 << std::endl;
-        ComplexNumber value = mat1.getVal(0, 0);
-        std::cout << "Matrix 1[0][0] = " << value << std::endl;
+        // Remove row
+        m1.removeRow(1);
+        std::cout << "Matrix m1 after removing row 1:\n" << m1;
 
-        // Test the copy constructor
-        rm::Matrix<ComplexNumber> mat3(mat2); // Copy constructor
-        std::cout << "Matrix 3 (copy of Matrix 2):\n" << mat3 << std::endl;
+        // Remove column
+        m1.removeColumn(2);
+        std::cout << "Matrix m1 after removing column 2:\n" << m1;
 
-        // Test the assignment operator
-        rm::Matrix<ComplexNumber> mat4(2, 2);
-        mat4 = mat1; // Assignment operator
-        std::cout << "Matrix 4 (assigned from Matrix 1):\n" << mat4 << std::endl;
+        // Equality operator
+        if (m1 == m2) {
+            std::cout << "m1 is equal to m2\n";
+        } else {
+            std::cout << "m1 is not equal to m2\n";
+        }
 
-        // Test destructor by creating a large matrix
-        {
-            rm::Matrix<int> largeMat(100, 100);
-            largeMat.randomFill(1, 10);
-            std::cout << "Large matrix created and filled." << std::endl;
-        } // Destructor will be called here when going out of scope
+        // Inequality operator
+        if (m1 != m2) {
+            std::cout << "m1 is not equal to m2\n";
+        }
+
+        // SquareMatrix initialization
+        rm::SquareMatrix<int> sm1(3, 1);
+        std::cout << "SquareMatrix sm1 initialized with 1:\n" << sm1;
+
+        // SquareMatrix initialization with values
+        rm::SquareMatrix<int> sm2(3, {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+        std::cout << "SquareMatrix sm2 initialized with values {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}:\n" << sm2;
+
+        // SquareMatrix minor
+        rm::SquareMatrix<int> sm3 = sm2.getMinor(1, 1);
+        std::cout << "Minor of sm2 after removing row 1, column 1:\n" << sm3;
 
     } catch (const std::exception& e) {
-        std::cout << "Caught exception: " << e.what() << std::endl;
+        std::cout << "Error: " << e.what() << std::endl;
     }
 
     return 0;
