@@ -22,38 +22,22 @@ public:
     // Copy constructor
     SquareMatrix(const SquareMatrix& other) : Matrix<T>(other) {}
 
-    // Function to calculate the minor (submatrix)
-    SquareMatrix getMinor(int row, int col) const {
-        if (this->m_rows != this->m_cols) {
-            throw std::invalid_argument("Matrix must be square to compute its minor.");
-        }
-
-        SquareMatrix minor(this->m_rows - 1);  // Create a new matrix of size m_rows-1
-        int minor_row = 0;
-
-        // Traverse through the matrix, skipping the selected row and column
-        for (int i = 0; i < this->m_rows; ++i) {
-            if (i == row) continue;  // Skip the row
-            int minor_col = 0;
-            for (int j = 0; j < this->m_cols; ++j) {
-                if (j == col) continue;  // Skip the column
-                minor.setVal(minor_row, minor_col, this->getVal(i, j));
-                ++minor_col;
-            }
-            ++minor_row;
-        }
-        return minor;
-    }
-
     // Function to calculate the cofactor
     T cofactor(int row, int col) const {
         if (this->m_rows != this->m_cols) {
             throw std::invalid_argument("Matrix must be square to compute its cofactor.");
         }
 
-        SquareMatrix minorMatrix = getMinor(row, col);
-        return minorMatrix.det();  // Calculate determinant of the minor
+        // Create a submatrix excluding the specified row and column
+        SquareMatrix minorMatrix = this->subMatrix(0, 0, this->m_rows, this->m_cols).removeRow(row).removeColumn(col);
+
+        // Compute the determinant of the minor matrix
+        T determinant = minorMatrix.det();
+
+        // Adjust the sign based on the cofactor position
+        return ((row + col) % 2 == 0 ? 1 : -1) * determinant;
     }
+
 
     // Function to calculate the determinant
     T det() const {

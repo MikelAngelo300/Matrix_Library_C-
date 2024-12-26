@@ -5,13 +5,15 @@
 #include <random>
 
 namespace rm {
-template<typename T>
+template <typename T>
+requires std::is_arithmetic_v<T>
 class Matrix {
 private:
     int m_rows, m_cols;
     T** m_data;
 
 public:
+
     // Constructor
     Matrix(int rows, int cols, T initValue = T())
         : m_rows(rows), m_cols(cols) {
@@ -28,6 +30,7 @@ public:
         }
     }
 
+    //Contructor with initializer list
     Matrix(int rows, int cols, std::initializer_list<std::initializer_list<T>> values)
         : m_rows(rows), m_cols(cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -46,6 +49,7 @@ public:
         }
     }
 
+    //Copy constructor
     Matrix(const Matrix& other)
         : m_rows(other.m_rows), m_cols(other.m_cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -121,14 +125,13 @@ public:
         }
     }
 
+    //Fill the matrix with Gaussian distribution numbers numbers 
     void randomFillGaussian(T mean, T stddev) {
-        // Inicjalizacja generatora liczb losowych
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<T> dist(mean, stddev);
 
 
-        // Wypełnianie macierzy
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = dist(gen);
@@ -136,14 +139,17 @@ public:
         }
     }
 
+    //Fill the matrix with 0
     void zeros() {
         this->fill(0);
     }
 
+    //Fill the matrix with 1
     void ones() {
         this->fill(1);
     }
 
+    //Calculate sum of every element in matrix
     T sum() const {
         T sum=0;
         for (int i = 0; i < m_rows; ++i) {
@@ -154,10 +160,12 @@ public:
         return sum;
     }
 
+    //Calculate mean value of every element in matrix
     T mean() const {
         return (this->sum()/(m_cols*m_rows));
     }
 
+    //Find minimal value in matrix
     T min() const {
         if (m_rows == 0 || m_cols == 0) {
             throw std::runtime_error("Matrix is empty, cannot determine the minimum value.");
@@ -175,6 +183,7 @@ public:
         return buf;
     }
 
+    //Find minimal value in matrix
     T max() const {
         if (m_rows == 0 || m_cols == 0) {
             throw std::runtime_error("Matrix is empty, cannot determine the minimum value.");
@@ -192,21 +201,32 @@ public:
         return buf;
     }
 
+    //Normalize matrix (rescale it with numbers between 0 and 1)
     void normalize() { 
-        if (this->max() == 0) {
-            throw std::runtime_error("Cannot normalize: maximum value is zero.");
-        }
+    T minValue = this->min();
+    T maxValue = this->max();
 
-        for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < m_cols; ++j) {
-                m_data[i][j] /= this->max();
-            }
+    if (maxValue == minValue) {
+       for (int i = 0; i < m_rows; ++i) {
+        for (int j = 0; j < m_cols; ++j) {
+            m_data[i][j] /= maxValue;
         }
+    } 
     }
 
+    for (int i = 0; i < m_rows; ++i) {
+        for (int j = 0; j < m_cols; ++j) {
+            m_data[i][j] = (m_data[i][j] - minValue) / (maxValue - minValue);
+        }
+    }
+}
+
+
+    //returns size of matrix in pair <rows,cols>
     std::pair<int, int> size() const {
         return {m_rows, m_cols};
     }
+
 
     void resize(int newRows, int newCols, T defaultValue = T()) {
         m_rows += newRows;
@@ -282,39 +302,31 @@ public:
             throw std::out_of_range("Invalid column position.");
         }
 
-        // Ensure the new column has the correct number of rows
         if (newCol.size() > m_rows) {
             throw std::invalid_argument("New column has more rows than the matrix.");
         }
 
-        // Create a temporary column array of size m_rows
         T fullCol[m_rows];
 
-        // Copy elements from newCol into fullCol
         size_t j = 0;
         for (const auto& value : newCol) {
             fullCol[j++] = value;
         }
 
-        // Fill the rest of the column with default values if necessary
         for (; j < m_rows; ++j) {
-            fullCol[j] = T();  // Default constructor of T
+            fullCol[j] = T();
         }
 
-        // Insert the column into the matrix at the specified position
-        // Shift columns to the right
         for (int i = m_cols; i > position; --i) {
             for (int j = 0; j < m_rows; ++j) {
                 m_data[j][i] = m_data[j][i - 1];
             }
         }
 
-        // Insert the new column at the specified position
         for (int j = 0; j < m_rows; ++j) {
             m_data[j][position] = fullCol[j];
         }
 
-        // Update the column count
         ++m_cols;
     }
 
@@ -323,19 +335,16 @@ public:
             throw std::out_of_range("Invalid row index.");
         }
 
-        // Shift rows upwards to fill the gap created by the removed row
         for (int i = rowIndex; i < m_rows - 1; ++i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = m_data[i + 1][j];
             }
         }
 
-        // Clear the last row (optional, depending on your implementation)
         for (int j = 0; j < m_cols; ++j) {
-            m_data[m_rows - 1][j] = T();  // Default constructor for type T
+            m_data[m_rows - 1][j] = T(); 
         }
-
-        // Update the row count
+        
         --m_rows;
     }
 
@@ -446,6 +455,19 @@ public:
         return result;
     }
 
+    Matrix operator+(const T other) const {
+        
+        Matrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] + other;
+            }
+        }
+
+        return result;
+    }
+
     // Matrix addition assignment
     Matrix& operator+=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
@@ -459,6 +481,18 @@ public:
         }
 
         return *this;
+    }
+
+    Matrix& operator+=(const T other) {
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] += other;
+            }
+        }
+
+        return *this;
+    
     }
 
     // Matrix subtraction
@@ -478,6 +512,19 @@ public:
         return result;
     }
 
+    Matrix operator-(const T other) const {
+        
+        Matrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] - other;
+            }
+        }
+
+        return result;
+    }
+
     // Matrix subtraction assignment
     Matrix& operator-=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
@@ -491,6 +538,18 @@ public:
         }
 
         return *this;
+    }
+
+    Matrix& operator-=(const T other) {
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] -= other;
+            }
+        }
+
+        return *this;
+    
     }
 
     // Matrix multiplication
@@ -514,6 +573,19 @@ public:
         return result;
     }
 
+    Matrix operator*(const T other) const {
+        
+        Matrix result(m_rows, other.m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < other.m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] * other;
+            }
+        }
+
+        return result;
+    }
+
     // Matrix multiplication assignment
     Matrix& operator*=(const Matrix& other) {
         if (m_cols != other.m_rows) {
@@ -529,6 +601,49 @@ public:
                     sum += m_data[i][k] * other.m_data[k][j];
                 }
                 result.m_data[i][j] = sum;
+            }
+        }
+
+        *this = result;
+
+        return *this;
+    }
+
+    Matrix& operator*=(const T other) {
+        
+        Matrix result(m_rows, other.m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < other.m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] * other;
+            }
+        }
+
+        *this = result;
+
+        return *this;
+    }
+
+     Matrix operator/(const T other) const {
+        
+        Matrix result(m_rows, other.m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < other.m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] / other;
+            }
+        }
+
+        return result;
+    }
+
+    Matrix& operator/=(const T other) {
+        
+        Matrix result(m_rows, other.m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < other.m_cols; ++j) {
+                result.m_data[i][j] = m_data[i][j] / other;
             }
         }
 

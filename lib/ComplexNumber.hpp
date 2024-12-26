@@ -1,6 +1,9 @@
 #include <cmath>
 #include <iostream>
 
+namespace rm {
+template <typename T>
+requires std::is_arithmetic_v<T>
 class ComplexNumber {
 private:
     double m_real;
@@ -102,4 +105,5 @@ public:
     }
 
 };
+}
 
