@@ -1,4 +1,5 @@
 Matrix Library
+
 This is a C++ library that provides an implementation for matrix operations, including basic matrix manipulations, matrix arithmetic, and operations on square and diagonal matrices. The library allows for operations on matrices of various types, where the elements are numeric (i.e., arithmetic types).
 
 Features
