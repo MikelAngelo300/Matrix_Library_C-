@@ -85,27 +85,3 @@ Compilation and Usage
     ./matrix_program
 
 This will compile your code and produce an executable named matrix_program which you can run.
-
-Example Usage
-
-    #include "Matrix.hpp"
-    
-    int main() {
-        // Create a 3x3 matrix and initialize with values
-        rm::Matrix<int> m1(3, 3);
-        m1.setVal(0, 0, 1);
-        m1.setVal(1, 1, 2);
-        m1.setVal(2, 2, 3);
-        
-        rm::Matrix<int> m2 = m1 + 5;
-        
-        for (int i = 0; i < m2.getRows(); ++i) {
-            for (int j = 0; j < m2.getCols(); ++j) {
-                std::cout << m2.getVal(i, j) << " ";
-            }
-            std::cout << std::endl;
-        }
-    
-        return 0;
-    }
-This example demonstrates how to create a matrix, perform scalar addition, and print the result.
