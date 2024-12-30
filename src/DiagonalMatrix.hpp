@@ -1,3 +1,22 @@
+/**
+ * @file DiagonalMatrix.hpp
+ * @brief Implementation of a templated DiagonalMatrix class derived from SquareMatrix.
+ *
+ * This class represents diagonal matrices, where only the diagonal elements are non-zero.
+ * It builds upon the SquareMatrix class, optimizing for diagonal-specific operations and
+ * ensuring constraints are maintained during initialization and modification.
+ * 
+ * Features include:
+ * - Constructors to initialize with a uniform value or a list of diagonal elements.
+ * - Validation of diagonal matrix properties for input matrices.
+ * - Extraction and modification of diagonal elements (`getDiagonal`, `setDiagonal`).
+ * - Identity matrix check (`isIdentity`).
+ * - Runtime validation for matrix dimensions and diagonal-specific constraints.
+ * 
+ * The DiagonalMatrix class is ideal for cases where mathematical operations on diagonal matrices
+ * are required, leveraging the efficiency of operations limited to diagonal elements.
+ */
+
 #include "SquareMatrix.hpp"
 
 namespace rm {

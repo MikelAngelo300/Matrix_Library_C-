@@ -1,3 +1,23 @@
+/**
+ * @file SquareMatrix.hpp
+ * @brief Implementation of a templated SquareMatrix class derived from the Matrix base class.
+ *
+ * This class provides operations specific to square matrices, including determinant calculation,
+ * inversion, matrix power, trace, and more. It is designed to handle mathematical operations
+ * commonly used in linear algebra while ensuring robust error checking for invalid operations.
+ * 
+ * Features include:
+ * - Determinant computation (`det`).
+ * - Matrix inversion (`inversed`).
+ * - Cofactor and cofactor matrix calculation (`cofactor`, `complement`).
+ * - Matrix power (`power`).
+ * - Trace calculation (`trace`).
+ * - Square matrix division (`operator/` and `operator/=`).
+ * - Constructors for initialization with dimensions, values, or another matrix.
+ * 
+ * This class ensures dimension validation and provides runtime exceptions for invalid operations.
+ */
+
 #include "Matrix.hpp"
 
 namespace rm {
@@ -121,5 +141,52 @@ public:
 
         return result;
     }
+
+    // Square matrix division
+    SquareMatrix operator/(const SquareMatrix& other) const {
+        if (m_rows != m_cols || other.m_rows != other.m_cols || m_cols != other.m_rows) {
+            throw std::invalid_argument("Matrices must be square and of the same size for division.");
+        }
+        SquareMatrix inverse = other.inversed();
+        SquareMatrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                T sum = 0;
+                for (int k = 0; k < m_cols; ++k) {
+                    sum += m_data[i][k] * inverse.m_data[k][j];
+                }
+                result.m_data[i][j] = sum;
+            }
+        }
+
+        return result;
+    }
+
+    // Square matrix division assignment
+    SquareMatrix& operator/=(const SquareMatrix& other) {
+        if (m_rows != m_cols || other.m_rows != other.m_cols || m_cols != other.m_rows) {
+            throw std::invalid_argument("Matrices must be square and of the same size for division.");
+        }
+        SquareMatrix inverse = other.inversed();
+        SquareMatrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                T sum = 0;
+                for (int k = 0; k < m_cols; ++k) {
+                    sum += m_data[i][k] * inverse.m_data[k][j];
+                }
+                result.m_data[i][j] = sum;
+            }
+        }
+
+        *this = std::move(result);
+        return *this;
+    }
+
+
+    
+
 };
 }

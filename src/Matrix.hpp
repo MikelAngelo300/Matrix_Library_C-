@@ -1,3 +1,26 @@
+/**
+ * @file Matrix.hpp
+ * @brief A templated matrix class for general-purpose mathematical operations.
+ *
+ * This header file defines a generic `Matrix` class that supports arithmetic types (and custom types 
+ * that meet certain requirements). The class provides a variety of matrix operations, including:
+ * 
+ * - Basic arithmetic operations (+, -, *, scalar operations)
+ * - Accessors and mutators for elements, rows, and columns
+ * - Matrix resizing, transposition, and rotation
+ * - Initialization and filling methods (e.g., zeros, ones, random values)
+ * - Statistical operations (e.g., sum, mean, min, max)
+ * - Normalization and submatrix extraction
+ * 
+ * The class ensures safety through bounds checking and supports additional functionality like 
+ * Gaussian random filling and row/column insertion or deletion.
+ * 
+ * @tparam T The data type of the matrix elements (must be arithmetic or satisfy custom requirements).
+ * 
+ * @note Users must manage the header file `ComplexNumber.hpp` dependency for complex number support.
+ */
+
+
 #include "../lib/ComplexNumber.hpp"
 #include <stdexcept>
 #include <cstdlib>
@@ -14,7 +37,7 @@ private:
 
 public:
 
-    // Constructor
+    // Constructor wiht initial value
     Matrix(int rows, int cols, T initValue = T())
         : m_rows(rows), m_cols(cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -36,6 +59,10 @@ public:
         if (m_rows <= 0 || m_cols <= 0) {
             throw std::invalid_argument("Matrix dimensions must be positive.");
         }
+        if (values.size() != m_rows || values.begin()->size() != m_cols) {
+            throw std::invalid_argument("Initializer list dimensions must match the matrix dimensions.");
+        }
+
 
         m_data = new T*[m_rows];
         auto row_it = values.begin();
@@ -98,7 +125,7 @@ public:
     }
 
     // Fill entire matrix with a specific value
-    void fill(T value) {
+    void fill(T value) const {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = value;
@@ -107,7 +134,7 @@ public:
     }
 
     // Fill with random values within a specified range
-    void randomFill(int min, int max) {
+    void randomFill(int min, int max) const {
         if (min > max) {
             throw std::invalid_argument("min cannot be greater than max.");
         }
@@ -126,7 +153,7 @@ public:
     }
 
     //Fill the matrix with Gaussian distribution numbers numbers 
-    void randomFillGaussian(T mean, T stddev) {
+    void randomFillGaussian(T mean, T stddev) const {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<T> dist(mean, stddev);
@@ -140,12 +167,12 @@ public:
     }
 
     //Fill the matrix with 0
-    void zeros() {
+    void zeros() const {
         this->fill(0);
     }
 
     //Fill the matrix with 1
-    void ones() {
+    void ones() const {
         this->fill(1);
     }
 
@@ -183,7 +210,7 @@ public:
         return buf;
     }
 
-    //Find minimal value in matrix
+    //Find maximal value in matrix
     T max() const {
         if (m_rows == 0 || m_cols == 0) {
             throw std::runtime_error("Matrix is empty, cannot determine the minimum value.");
@@ -202,7 +229,7 @@ public:
     }
 
     //Normalize matrix (rescale it with numbers between 0 and 1)
-    void normalize() { 
+    void normalize() const { 
     T minValue = this->min();
     T maxValue = this->max();
 
@@ -227,7 +254,7 @@ public:
         return {m_rows, m_cols};
     }
 
-
+    //Adds new rows and columns to the matrix all new numbers will be set to initial value
     void resize(int newRows, int newCols, T defaultValue = T()) {
         m_rows += newRows;
         m_cols += newCols;
@@ -239,6 +266,7 @@ public:
         }
     }
 
+    //Extracts submatrix  
     Matrix subMatrix(int startRow, int startCol, int numRows, int numCols) const {
         if (startRow < 0 || startCol < 0 || startRow + numRows > m_rows || startCol + numCols > m_cols) {
             throw std::out_of_range("Submatrix dimensions exceed matrix boundaries.");
@@ -254,49 +282,42 @@ public:
         return result;
     }
 
+    //Adds row to the matrix
     void addRow(int position, std::initializer_list<T> newRow) {
         if (position < 0 || position > m_rows) {
             throw std::out_of_range("Invalid row position.");
         }
 
-        // Ensure the new row has the correct number of columns
         if (newRow.size() > m_cols) {
             throw std::invalid_argument("New row has more columns than the matrix.");
         }
 
-        // Create a temporary row array of size m_cols
         T fullRow[m_cols];
 
-        // Copy elements from newRow into fullRow
         size_t j = 0;
         for (const auto& value : newRow) {
             fullRow[j++] = value;
         }
 
-        // Fill the rest of the row with default values if necessary
         for (; j < m_cols; ++j) {
-            fullRow[j] = T();  // Default constructor of T
+            fullRow[j] = T();
         }
 
-        // Insert the row into the matrix at the specified position
-        // Shift rows downwards
         for (int i = m_rows; i > position; --i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = m_data[i - 1][j];
             }
         }
 
-        // Insert the new row at the specified position
         for (int j = 0; j < m_cols; ++j) {
             m_data[position][j] = fullRow[j];
         }
 
-        // Update the row count
         ++m_rows;
     }
 
 
-
+    //Adds column to the matrix
     void addCol(int position, std::initializer_list<T> newCol) {
         if (position < 0 || position > m_cols) {
             throw std::out_of_range("Invalid column position.");
@@ -330,6 +351,7 @@ public:
         ++m_cols;
     }
 
+    //Removes row from the matrix
     void removeRow(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= m_rows) {
             throw std::out_of_range("Invalid row index.");
@@ -348,29 +370,26 @@ public:
         --m_rows;
     }
 
-
+    //Removes column form the matrix
     void removeColumn(int colIndex) {
         if (colIndex < 0 || colIndex >= m_cols) {
             throw std::out_of_range("Invalid column index");
         }
 
-        // Shift columns to the left to fill the gap created by the removed column
         for (int i = 0; i < m_rows; ++i) {
             for (int j = colIndex; j < m_cols - 1; ++j) {
                 m_data[i][j] = m_data[i][j + 1];
             }
         }
 
-        // Clear the last column of each row (optional, depending on your implementation)
         for (int i = 0; i < m_rows; ++i) {
-            m_data[i][m_cols - 1] = T();  // Default constructor for type T
+            m_data[i][m_cols - 1] = T();
         }
 
-        // Update the column count
         --m_cols;
     }
 
-    
+    //Multiplies matrix by a scalar
     void scale(T scalar) {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
@@ -379,22 +398,21 @@ public:
         }
     }
 
+    // Transposes a matrix
     Matrix transpose() const {
-        // Create a new matrix with swapped dimensions
         Matrix<T> transposed(m_cols, m_rows); 
 
-        // Loop over the original matrix and assign values to the transposed matrix
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
-                transposed.m_data[j][i] = m_data[i][j];  // Swap rows and columns
+                transposed.m_data[j][i] = m_data[i][j];
             }
         }
 
         return transposed;
     }
 
+    // Transposes a matrix to the same one
     void selfTranspose() {
-        // Utworzenie kopii danych, ponieważ transponowanie zmienia wymiary
         T** newData = new T*[m_cols];
         for (int i = 0; i < m_cols; ++i) {
             newData[i] = new T[m_rows];
@@ -403,36 +421,32 @@ public:
             }
         }
 
-        // Dealokacja starej macierzy
         for (int i = 0; i < m_rows; ++i) {
             delete[] m_data[i];
         }
         delete[] m_data;
-
-        // Zamiana wymiarów i przypisanie nowej macierzy
         std::swap(m_rows, m_cols);
         m_data = newData;
     }
-
+    
+    //Rotates matrix by 90 degrees clockwise
     Matrix rotate90() const {
-        // Tworzymy wynikową macierz o wymiarach m_cols x m_rows
         Matrix result(m_cols, m_rows);
 
-        // Iteracja przez oryginalną macierz i przekształcanie elementów
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
-                // Obrót o 90 stopni zgodnie z zasadami
                 result.m_data[j][m_rows - 1 - i] = m_data[i][j];
             }
         }
 
         return result;
     }
-
+    // Rotates matrix by 180 degrees clockwise
     Matrix rotate180() const {
         return this->rotate90().rotate90();
     }
 
+    // Rotates matrix 270 degrees clockwise
     Matrix rotate270() const {
         return this->rotate180().rotate90();
     }
@@ -455,6 +469,7 @@ public:
         return result;
     }
 
+    //Matrix addition element wise
     Matrix operator+(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -483,6 +498,7 @@ public:
         return *this;
     }
 
+    // Matrix addition assignment element wise
     Matrix& operator+=(const T other) {
 
         for (int i = 0; i < m_rows; ++i) {
@@ -512,6 +528,7 @@ public:
         return result;
     }
 
+    // Matrix substraction element wise
     Matrix operator-(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -540,6 +557,7 @@ public:
         return *this;
     }
 
+    // Matrix subtraction assignment element wise
     Matrix& operator-=(const T other) {
 
         for (int i = 0; i < m_rows; ++i) {
@@ -573,6 +591,7 @@ public:
         return result;
     }
 
+    // Matrix multiplication element wise
     Matrix operator*(const T other) const {
         
         Matrix result(m_rows, other.m_cols);
@@ -609,6 +628,7 @@ public:
         return *this;
     }
 
+    // Matrix multiplication assignment element wise
     Matrix& operator*=(const T other) {
         
         Matrix result(m_rows, other.m_cols);
@@ -624,7 +644,8 @@ public:
         return *this;
     }
 
-     Matrix operator/(const T other) const {
+    // Matrix division element wise
+    Matrix operator/(const T other) const {
         
         Matrix result(m_rows, other.m_cols);
 
@@ -637,6 +658,7 @@ public:
         return result;
     }
 
+    // Matrix division assignment elemnt wise
     Matrix& operator/=(const T other) {
         
         Matrix result(m_rows, other.m_cols);
@@ -661,7 +683,6 @@ public:
             }
             delete[] m_data;
 
-            // Allocate new memory and copy values
             m_rows = other.m_rows;
             m_cols = other.m_cols;
             m_data = new T*[m_rows];
@@ -693,10 +714,11 @@ public:
 
     // Inequality operator
     bool operator!=(const Matrix& other) const {
-        return !(*this == other);  // Delegate to the equality operator
+        return !(*this == other);
     }
 
-    // Stream output operator
+
+    // Override of th "<<" operator
     template<typename U>
     friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& M);
 };
