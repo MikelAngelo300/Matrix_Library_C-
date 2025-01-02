@@ -24,14 +24,14 @@ namespace rm {
 template <typename T>
 class SquareMatrix : public Matrix<T> {
 public:
-    // Constructor with size validation for square matrix
+    // Constructor for SquareMatrix with defualt value
     SquareMatrix(int dim, T initValue = T()) : Matrix<T>(dim, dim, initValue) {
         if (dim <= 0) {
             throw std::invalid_argument("Dimension of the matrix must be greater than zero.");
         }
     }
 
-    // Constructor with initializer list
+    // Constructor for SquareMatrix with initializer list
     SquareMatrix(int dim, std::initializer_list<std::initializer_list<T>> values)
         : Matrix<T>(dim, dim, values) {
         if (dim <= 0) {
@@ -116,13 +116,11 @@ public:
             throw std::invalid_argument("Exponent must be non-negative.");
         }
         
-        // Initialize the result as the identity matrix
-        SquareMatrix result(this->m_rows, T(1));  // Identity matrix of size m_rows
+        SquareMatrix result(this->m_rows, T(1));  
         SquareMatrix base = *this;
 
-        // Multiply result by base (matrix) n times
         for (int i = 0; i < n; ++i) {
-            result *= base;  // Multiply result by base (this) in each iteration
+            result *= base;  
         }
 
         return result;
@@ -136,7 +134,7 @@ public:
 
         T result = 0;
         for (int i = 0; i < this->m_rows; ++i) {
-            result += this->getVal(i, i);  // Only sum diagonal elements
+            result += this->getVal(i, i);
         }
 
         return result;
@@ -184,9 +182,5 @@ public:
         *this = std::move(result);
         return *this;
     }
-
-
-    
-
 };
 }

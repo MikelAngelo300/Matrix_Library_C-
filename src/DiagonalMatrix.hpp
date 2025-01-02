@@ -24,7 +24,7 @@ template <typename T>
 requires std::is_arithmetic_v<T>
 class DiagonalMatrix : public SquareMatrix<T> {
 public:
-    
+    // Constructor for DiagonalMatrix with defualt value
     DiagonalMatrix(int dim, T initValue = T()) : SquareMatrix<T>(dim, T()) {
         if (dim <= 0) {
             throw std::invalid_argument("Dimension of the matrix must be greater than zero.");
@@ -34,7 +34,7 @@ public:
             this->m_data[i][i]=initValue;
         }
     }
-
+    // Constructor for DiagonalMatrix with initializer list
     DiagonalMatrix(int dim, std::initializer_list<T> values)
         : SquareMatrix<T>(dim) {
         if (dim <= 0) {
@@ -49,8 +49,8 @@ public:
             this->m_data[i][i] = *it++;
         }
     }
-
-    DiagonalMatrix(const SquareMatrix<T>& other) : SquareMatrix<T>(other) {
+    // Copy constructor
+    DiagonalMatrix(const DiagonalMatrix<T>& other) : SquareMatrix<T>(other) {
         for (int i = 0; i < this->m_rows; ++i) {
             for (int j = 0; j < this->m_cols; ++j) {
                 if (i != j && this->m_data[i][j] != T()) {
@@ -60,6 +60,8 @@ public:
         }
     }
 
+
+    // getter for diagonal
     std::initializer_list<T> getDiagonal() const {
         if (this->m_rows != this->m_cols) {
             throw std::logic_error("Matrix is not square, cannot extract diagonal.");
@@ -73,6 +75,7 @@ public:
         return {diagonal, diagonal + this->m_rows}; 
     }
 
+    // Setter for diagonal
     void setDiagonal(std::initializer_list<T> values) {
         if (values.size() != static_cast<size_t>(this->m_rows)) {
             throw std::invalid_argument("Number of diagonal elements must match the dimension of the matrix.");
@@ -84,6 +87,7 @@ public:
         }
     }
     
+    // Checks whether there are only ones in the diagonal
     bool isIdentity() const {
     for (int i = 0; i < this->m_rows; ++i) {
         for (int j = 0; j < this->m_cols; ++j) {
