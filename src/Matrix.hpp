@@ -125,7 +125,7 @@ public:
     }
 
     // Fill entire matrix with a specific value
-    void fill(T value) {
+    virtual void fill(T value) {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = value;
@@ -134,7 +134,7 @@ public:
     }
 
     // Fill with random values within a specified range
-    void randomFill(int min, int max) {
+    virtual void randomFill(int min, int max) {
         if (min > max) {
             throw std::invalid_argument("min cannot be greater than max.");
         }
@@ -153,7 +153,7 @@ public:
     }
 
     //Fill the matrix with Gaussian distribution numbers numbers 
-    void randomFillGaussian(T mean, T stddev) {
+    virtual void randomFillGaussian(T mean, T stddev) {
         static_assert(std::is_floating_point<T>::value, "T must be a floating-point type.");
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -168,12 +168,12 @@ public:
     }
 
     //Fill the matrix with 0
-    void zeros() {
+    virtual void zeros() {
         this->fill(0);
     }
 
     //Fill the matrix with 1
-    void ones() {
+    virtual void ones() {
         this->fill(1);
     }
 
@@ -255,18 +255,6 @@ public:
         return {m_rows, m_cols};
     }
 
-    //Adds new rows and columns to the matrix all new numbers will be set to initial value
-    void resize(int newRows, int newCols, T defaultValue = T()) {
-        m_rows += newRows;
-        m_cols += newCols;
-
-        for (int i = newRows; i < m_rows; ++i) {
-            for (int j = newCols; j < m_cols; ++j) {
-                m_data[i][j] = defaultValue;
-            }
-        }
-    }
-
     //Extracts submatrix  
     Matrix subMatrix(int startRow, int startCol, int numRows, int numCols) const {
         if (startRow < 0 || startCol < 0 || startRow + numRows > m_rows || startCol + numCols > m_cols) {
@@ -293,29 +281,40 @@ public:
             throw std::invalid_argument("New row has more columns than the matrix.");
         }
 
-        T fullRow[m_cols];
-
-        size_t j = 0;
-        for (const auto& value : newRow) {
-            fullRow[j++] = value;
+        T** newData = new T*[m_rows + 1];
+        for (int i = 0; i < m_rows + 1; ++i) {
+            newData[i] = new T[m_cols];
         }
 
-        for (; j < m_cols; ++j) {
-            fullRow[j] = T();
-        }
-
-        for (int i = m_rows; i > position; --i) {
+        for (int i = 0; i < position; ++i) {
             for (int j = 0; j < m_cols; ++j) {
-                m_data[i][j] = m_data[i - 1][j];
+                newData[i][j] = m_data[i][j];
             }
         }
 
-        for (int j = 0; j < m_cols; ++j) {
-            m_data[position][j] = fullRow[j];
+        for (int i = position; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                newData[i + 1][j] = m_data[i][j];
+            }
         }
 
-        ++m_rows;
+        int col = 0;
+        for (const auto& value : newRow) {
+            newData[position][col++] = value;
+        }
+        for (; col < m_cols; ++col) {
+            newData[position][col] = T();
+        }
+
+        for (int i = 0; i < m_rows; ++i) {
+            delete[] m_data[i];
+        }
+        delete[] m_data;
+
+        m_data = newData;
+        ++m_rows; 
     }
+
 
 
     //Adds column to the matrix
@@ -328,27 +327,34 @@ public:
             throw std::invalid_argument("New column has more rows than the matrix.");
         }
 
-        T fullCol[m_rows];
-
-        size_t j = 0;
-        for (const auto& value : newCol) {
-            fullCol[j++] = value;
+        T** newData = new T*[m_rows];
+        for (int i = 0; i < m_rows; ++i) {
+            newData[i] = new T[m_cols + 1];
         }
 
-        for (; j < m_rows; ++j) {
-            fullCol[j] = T();
-        }
-
-        for (int i = m_cols; i > position; --i) {
-            for (int j = 0; j < m_rows; ++j) {
-                m_data[j][i] = m_data[j][i - 1];
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < position; ++j) {
+                newData[i][j] = m_data[i][j];
+            }
+            for (int j = position; j < m_cols; ++j) {
+                newData[i][j + 1] = m_data[i][j];
             }
         }
 
-        for (int j = 0; j < m_rows; ++j) {
-            m_data[j][position] = fullCol[j];
+        int row = 0;
+        for (const auto& value : newCol) {
+            newData[row++][position] = value;
+        }
+        for (; row < m_rows; ++row) {
+            newData[row][position] = T();
         }
 
+        for (int i = 0; i < m_rows; ++i) {
+            delete[] m_data[i];
+        }
+        delete[] m_data;
+
+        m_data = newData;
         ++m_cols;
     }
 

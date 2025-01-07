@@ -24,16 +24,17 @@ template <typename T>
 requires std::is_arithmetic_v<T>
 class DiagonalMatrix : public SquareMatrix<T> {
 public:
-    // Constructor for DiagonalMatrix with defualt value
+    // Constructor for DiagonalMatrix with default value
     DiagonalMatrix(int dim, T initValue = T()) : SquareMatrix<T>(dim, T()) {
         if (dim <= 0) {
             throw std::invalid_argument("Dimension of the matrix must be greater than zero.");
         }
 
-        for (int i=0; i<dim;i++) {
-            this->m_data[i][i]=initValue;
+        for (int i = 0; i < dim; i++) {
+            this->setVal(i,i, initValue);
         }
     }
+
     // Constructor for DiagonalMatrix with initializer list
     DiagonalMatrix(int dim, std::initializer_list<T> values)
         : SquareMatrix<T>(dim) {
@@ -46,55 +47,57 @@ public:
 
         auto it = values.begin();
         for (int i = 0; i < dim; ++i) {
-            this->m_data[i][i] = *it++;
+            this->setVal(i,i, *it++);
         }
     }
+
     // Copy constructor
     DiagonalMatrix(const DiagonalMatrix<T>& other) : SquareMatrix<T>(other) {
-        for (int i = 0; i < this->m_rows; ++i) {
-            for (int j = 0; j < this->m_cols; ++j) {
-                if (i != j && this->m_data[i][j] != T()) {
+        for (int i = 0; i < this->getRows(); ++i) {
+            for (int j = 0; j < this->getCols(); ++j) {
+                if (i != j && this->getVal(i,j) != T()) {
                     throw std::invalid_argument("Input matrix is not diagonal.");
                 }
             }
         }
     }
 
-
-    // getter for diagonal
-    std::initializer_list<T> getDiagonal() const {
-        if (this->m_rows != this->m_cols) {
-            throw std::logic_error("Matrix is not square, cannot extract diagonal.");
-        }
-
-        T diagonal[this->m_rows]; 
-        for (int i = 0; i < this->m_rows; ++i) {
-            diagonal[i] = this->m_data[i][i]; 
-        }
-
-        return {diagonal, diagonal + this->m_rows}; 
+    // Getter for diagonal
+    T* getDiagonal() const {
+    if (this->getRows() != this->getCols()) {
+        throw std::logic_error("Matrix is not square, cannot extract diagonal.");
     }
+
+    T* diagonal = new T[this->getRows()];
+    for (int i = 0; i < this->getRows(); ++i) {
+        diagonal[i] = this->getVal(i, i);  // Extract diagonal elements
+    }
+
+    return diagonal;
+}
+
+
 
     // Setter for diagonal
     void setDiagonal(std::initializer_list<T> values) {
-        if (values.size() != static_cast<size_t>(this->m_rows)) {
+        if (values.size() != static_cast<size_t>(this->getRows())) {
             throw std::invalid_argument("Number of diagonal elements must match the dimension of the matrix.");
         }
 
         auto it = values.begin();
-        for (int i = 0; i < this->m_rows; ++i) {
-            this->m_data[i][i] = *it++;
+        for (int i = 0; i < this->getRows(); ++i) {
+            this->setVal(i,i, *it++);
         }
     }
-    
-    // Checks whether there are only ones in the diagonal
+
+    // Checks whether the matrix is an identity matrix
     bool isIdentity() const {
-        for (int i = 0; i < this->m_rows; ++i) {
-            for (int j = 0; j < this->m_cols; ++j) {
-                if (i != j && this->m_data[i][j] != T()) {
+        for (int i = 0; i < this->getRows(); ++i) {
+            for (int j = 0; j < this->getCols(); ++j) {
+                if (i != j && this->getVal(i,j) != T()) {
                     return false;
                 }
-                if (i == j && this->m_data[i][j] != T(1)) {
+                if (i == j && this->getVal(i,j) != T(1)) {
                     return false;
                 }
             }
@@ -103,13 +106,13 @@ public:
     }
 
     void fill(T value) override {
-         for (int i = 0; i < this->m_rows; ++i) {
-                this->m_data[i][i] = value;
+        for (int i = 0; i < this->getRows(); ++i) {
+            this->setVal(i,i, value);
         }
     }
 
-    // Fill the diagonal of matrix with random values within specified range
-    void randomFill(int min, int max) override{
+    // Fill the diagonal with random values within a specified range
+    void randomFill(int min, int max) override {
         if (min > max) {
             throw std::invalid_argument("min cannot be greater than max.");
         }
@@ -120,33 +123,32 @@ public:
             seeded = true;
         }
 
-        for (int i = 0; i < this->m_rows; ++i) {
-                this->m_data[i][i] = rand() % (max - min + 1) + min;
-            }
+        for (int i = 0; i < this->getRows(); ++i) {
+            this->setVal(i,i, rand() % (max - min + 1) + min);
+        }
     }
 
-    // Fill the diagonal of matrix with Gaussian distrbution of random values
+    // Fill the diagonal with Gaussian distribution of random values
     void randomFillGaussian(T mean, T stddev) override {
         static_assert(std::is_floating_point<T>::value, "T must be a floating-point type.");
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<T> dist(mean, stddev);
 
-
-        for (int i = 0; i < this->m_rows; ++i) {
-                this->m_data[i][i] = dist(gen);
+        for (int i = 0; i < this->getRows(); ++i) {
+            this->setVal(i,i,dist(gen));
         }
     }
 
-    //Fill the matrix with 0
+    // Fill the matrix with 0
     void zeros() override {
         this->fill(0);
     }
 
-    //Fill the diagonal of matrix with 1
+    // Fill the diagonal with 1
     void ones() override {
         this->fill(1);
     }
-
+    
 };
 }
