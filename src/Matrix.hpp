@@ -125,7 +125,7 @@ public:
     }
 
     // Fill entire matrix with a specific value
-    void fill(T value) const {
+    void fill(T value) {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = value;
@@ -134,7 +134,7 @@ public:
     }
 
     // Fill with random values within a specified range
-    void randomFill(int min, int max) const {
+    void randomFill(int min, int max) {
         if (min > max) {
             throw std::invalid_argument("min cannot be greater than max.");
         }
@@ -153,7 +153,8 @@ public:
     }
 
     //Fill the matrix with Gaussian distribution numbers numbers 
-    void randomFillGaussian(T mean, T stddev) const {
+    void randomFillGaussian(T mean, T stddev) {
+        static_assert(std::is_floating_point<T>::value, "T must be a floating-point type.");
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<T> dist(mean, stddev);
@@ -167,12 +168,12 @@ public:
     }
 
     //Fill the matrix with 0
-    void zeros() const {
+    void zeros() {
         this->fill(0);
     }
 
     //Fill the matrix with 1
-    void ones() const {
+    void ones() {
         this->fill(1);
     }
 
@@ -230,23 +231,23 @@ public:
 
     //Normalize matrix (rescale it with numbers between 0 and 1)
     void normalize() const { 
-    T minValue = this->min();
-    T maxValue = this->max();
+        T minValue = this->min();
+        T maxValue = this->max();
 
-    if (maxValue == minValue) {
-       for (int i = 0; i < m_rows; ++i) {
-        for (int j = 0; j < m_cols; ++j) {
-            m_data[i][j] /= maxValue;
+        if (maxValue == minValue) {
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] /= maxValue;
+            }
+        } 
         }
-    } 
-    }
 
-    for (int i = 0; i < m_rows; ++i) {
-        for (int j = 0; j < m_cols; ++j) {
-            m_data[i][j] = (m_data[i][j] - minValue) / (maxValue - minValue);
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] = (m_data[i][j] - minValue) / (maxValue - minValue);
+            }
         }
     }
-}
 
 
     //returns size of matrix in pair <rows,cols>

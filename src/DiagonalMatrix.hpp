@@ -89,18 +89,64 @@ public:
     
     // Checks whether there are only ones in the diagonal
     bool isIdentity() const {
-    for (int i = 0; i < this->m_rows; ++i) {
-        for (int j = 0; j < this->m_cols; ++j) {
-            if (i != j && this->m_data[i][j] != T()) {
-                return false;
-            }
-            if (i == j && this->m_data[i][j] != T(1)) {
-                return false;
+        for (int i = 0; i < this->m_rows; ++i) {
+            for (int j = 0; j < this->m_cols; ++j) {
+                if (i != j && this->m_data[i][j] != T()) {
+                    return false;
+                }
+                if (i == j && this->m_data[i][j] != T(1)) {
+                    return false;
+                }
             }
         }
+        return true;
     }
-    return true;
-}
+
+    void fill(T value) override {
+         for (int i = 0; i < this->m_rows; ++i) {
+                this->m_data[i][i] = value;
+        }
+    }
+
+    // Fill the diagonal of matrix with random values within specified range
+    void randomFill(int min, int max) override{
+        if (min > max) {
+            throw std::invalid_argument("min cannot be greater than max.");
+        }
+
+        static bool seeded = false;
+        if (!seeded) {
+            srand(static_cast<unsigned int>(time(0)));
+            seeded = true;
+        }
+
+        for (int i = 0; i < this->m_rows; ++i) {
+                this->m_data[i][i] = rand() % (max - min + 1) + min;
+            }
+    }
+
+    // Fill the diagonal of matrix with Gaussian distrbution of random values
+    void randomFillGaussian(T mean, T stddev) override {
+        static_assert(std::is_floating_point<T>::value, "T must be a floating-point type.");
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::normal_distribution<T> dist(mean, stddev);
+
+
+        for (int i = 0; i < this->m_rows; ++i) {
+                this->m_data[i][i] = dist(gen);
+        }
+    }
+
+    //Fill the matrix with 0
+    void zeros() override {
+        this->fill(0);
+    }
+
+    //Fill the diagonal of matrix with 1
+    void ones() override {
+        this->fill(1);
+    }
 
 };
 }

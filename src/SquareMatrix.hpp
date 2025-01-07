@@ -142,17 +142,17 @@ public:
 
     // Square matrix division
     SquareMatrix operator/(const SquareMatrix& other) const {
-        if (m_rows != m_cols || other.m_rows != other.m_cols || m_cols != other.m_rows) {
+        if (this->m_rows != this->m_cols || other.m_rows != other.m_cols || this->m_cols != other.m_rows) {
             throw std::invalid_argument("Matrices must be square and of the same size for division.");
         }
         SquareMatrix inverse = other.inversed();
-        SquareMatrix result(m_rows, m_cols);
+        SquareMatrix result(this->m_rows, this->m_cols);
 
-        for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < m_cols; ++j) {
+        for (int i = 0; i < this->m_rows; ++i) {
+            for (int j = 0; j < this->m_cols; ++j) {
                 T sum = 0;
-                for (int k = 0; k < m_cols; ++k) {
-                    sum += m_data[i][k] * inverse.m_data[k][j];
+                for (int k = 0; k < this->m_cols; ++k) {
+                    sum += this->m_data[i][k] * inverse.m_data[k][j];
                 }
                 result.m_data[i][j] = sum;
             }
@@ -163,17 +163,17 @@ public:
 
     // Square matrix division assignment
     SquareMatrix& operator/=(const SquareMatrix& other) {
-        if (m_rows != m_cols || other.m_rows != other.m_cols || m_cols != other.m_rows) {
+        if (this->m_rows != this->m_cols || other.m_rows != other.m_cols || this->m_cols != other.m_rows) {
             throw std::invalid_argument("Matrices must be square and of the same size for division.");
         }
         SquareMatrix inverse = other.inversed();
-        SquareMatrix result(m_rows, m_cols);
+        SquareMatrix result(this->m_rows, this->m_cols);
 
-        for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < m_cols; ++j) {
+        for (int i = 0; i < this->m_rows; ++i) {
+            for (int j = 0; j < this->m_cols; ++j) {
                 T sum = 0;
-                for (int k = 0; k < m_cols; ++k) {
-                    sum += m_data[i][k] * inverse.m_data[k][j];
+                for (int k = 0; k < this->m_cols; ++k) {
+                    sum += this->m_data[i][k] * inverse.m_data[k][j];
                 }
                 result.m_data[i][j] = sum;
             }
