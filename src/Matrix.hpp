@@ -63,7 +63,6 @@ public:
             throw std::invalid_argument("Initializer list dimensions must match the matrix dimensions.");
         }
 
-
         m_data = new T*[m_rows];
         auto row_it = values.begin();
         for (int i = 0; i < m_rows; ++i) {
@@ -315,8 +314,6 @@ public:
         ++m_rows; 
     }
 
-
-
     //Adds column to the matrix
     void addCol(int position, std::initializer_list<T> newCol) {
         if (position < 0 || position > m_cols) {
@@ -457,7 +454,6 @@ public:
     Matrix rotate270() const {
         return this->rotate180().rotate90();
     }
-
 
     // Matrix addition
     Matrix operator+(const Matrix& other) const {

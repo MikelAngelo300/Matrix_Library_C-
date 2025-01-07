@@ -76,8 +76,6 @@ public:
     return diagonal;
 }
 
-
-
     // Setter for diagonal
     void setDiagonal(std::initializer_list<T> values) {
         if (values.size() != static_cast<size_t>(this->getRows())) {

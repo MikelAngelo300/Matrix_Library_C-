@@ -56,15 +56,12 @@ public:
             throw std::invalid_argument("Matrix must be square to compute its cofactor.");
         }
 
-        // Create a submatrix excluding the specified row and column
         SquareMatrix<T> minorMatrix = this->subMatrix(0, 0, this->getRows(), this->getCols());
         minorMatrix.removeRow(row);
         minorMatrix.removeColumn(col);
 
-        // Compute the determinant of the minor matrix
         T determinant = minorMatrix.det();
 
-        // Adjust the sign based on the cofactor position
         return ((row + col) % 2 == 0 ? 1 : -1) * determinant;
     }
 
@@ -95,7 +92,6 @@ public:
 
         for (int i = 0; i < this->getRows(); ++i) {
             for (int j = 0; j < this->getCols(); ++j) {
-                // Set cofactor with the proper sign
                 result.setVal(i, j, cofactor(i, j) * ((i + j) % 2 == 0 ? 1 : -1));
             }
         }
@@ -109,29 +105,24 @@ public:
             throw std::invalid_argument("Matrix is singular and cannot be inverted.");
         }
 
-        // Get the cofactor matrix (Matrix<T> type)
         Matrix<T> comp = this->complement();
 
-        // Transpose the cofactor matrix (Matrix<T> type)
         Matrix<T> trans = comp.transpose();
 
-        // Ensure the transposed matrix is valid and can be copied to SquareMatrix
         if (trans.getRows() != this->getRows() || trans.getCols() != this->getCols()) {
             throw std::invalid_argument("Transpose dimensions are inconsistent.");
         }
 
-        // Create the SquareMatrix from the transposed Matrix
         SquareMatrix<T> squareTrans(trans.getRows(), trans.getCols());
         for (int i = 0; i < trans.getRows(); ++i) {
             for (int j = 0; j < trans.getCols(); ++j) {
-                squareTrans.setVal(i, j, trans.getVal(i, j));  // Copy values to the SquareMatrix
+                squareTrans.setVal(i, j, trans.getVal(i, j));
             }
         }
 
-        // Apply scaling by 1/determinant using the void-returning scale function
         T determinant = this->det();
         if (determinant != 0) {
-            squareTrans.scale(1 / determinant);  // Scale the matrix in place
+            squareTrans.scale(1 / determinant);
         } else {
             throw std::invalid_argument("Matrix is singular, cannot scale.");
         }

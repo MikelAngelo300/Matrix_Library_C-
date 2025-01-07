@@ -118,6 +118,7 @@ int main() {
         float trace = sm3.trace();
         std::cout << "Trace of sm3: " << trace << "\n";
 
+        // SquareMatrix power
         rm::SquareMatrix<float> sm5 = sm2;
         sm5.fill(2);
         sm5 = sm5.power(3);
