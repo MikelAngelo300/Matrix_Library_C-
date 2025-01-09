@@ -2,7 +2,7 @@
  * @file Matrix.hpp
  * @author Ryszard Mleczko
  * @date Jan 2025
- * @brief A templated matrix class for general-purpose mathematical operations.
+ * @brief A templated Matrix class for general-purpose mathematical operations.
  */
 
 
@@ -29,6 +29,10 @@ private:
     T** m_data;
 
 public:
+
+    /**
+     * Constructors and destructor
+     */
 
     /**
      * @brief Parametric constructor of Matrix with default value
@@ -157,7 +161,7 @@ public:
      * @param j - column number
      * @param newVal - new Value that is being set 
      */
-    void setVal(int i, int j, T newVal) {
+    virtual void setVal(int i, int j, T newVal) {
         if (i < 0 || i >= m_rows || j < 0 || j >= m_cols) {
             throw std::out_of_range("Matrix indices are out of range.");
         }
@@ -385,20 +389,7 @@ public:
      * @brief Transposes the matrix in place, modifying the original matrix 
      */
     void selfTranspose() {
-        T** newData = new T*[m_cols];
-        for (int i = 0; i < m_cols; ++i) {
-            newData[i] = new T[m_rows];
-            for (int j = 0; j < m_rows; ++j) {
-                newData[i][j] = m_data[j][i];
-            }
-        }
-
-        for (int i = 0; i < m_rows; ++i) {
-            delete[] m_data[i];
-        }
-        delete[] m_data;
-        std::swap(m_rows, m_cols);
-        m_data = newData;
+        *this = this->transpose();
     }
 
     /**
