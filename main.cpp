@@ -149,7 +149,7 @@ int main() {
         std::cout << "Determinant of dm1: " << detD << "\n";
 
         // DiagonalMatrix inverse
-        rm::SquareMatrix<float> dm4 = dm1.inversed();
+        rm::DiagonalMatrix<float> dm4 = dm1.inversed();
         std::cout << "Inverse of dm1:\n" << dm4;
 
         // DiagonalMatrix trace
