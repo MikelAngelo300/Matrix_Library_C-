@@ -1,21 +1,9 @@
 /**
  * @file SquareMatrix.hpp
- * @brief Implementation of a templated SquareMatrix class derived from the Matrix base class.
- *
- * This class provides operations specific to square matrices, including determinant calculation,
- * inversion, matrix power, trace, and more. It is designed to handle mathematical operations
- * commonly used in linear algebra while ensuring robust error checking for invalid operations.
- * 
- * Features include:
- * - Determinant computation (`det`).
- * - Matrix inversion (`inversed`).
- * - Cofactor and cofactor matrix calculation (`cofactor`, `complement`).
- * - Matrix power (`power`).
- * - Trace calculation (`trace`).
- * - Square matrix division (`operator/` and `operator/=`).
- * - Constructors for initialization with dimensions, values, or another matrix.
- * 
- * This class ensures dimension validation and provides runtime exceptions for invalid operations.
+ * @author Ryszard Mleczko
+ * @date Jan 2025
+ * @brief A templated square matrix class for general-purpose mathematical operations.
+ * @tparam T The data type of the matrix elements (must be arithmetic or satisfy custom requirements).
  */
 
 #include "Matrix.hpp"

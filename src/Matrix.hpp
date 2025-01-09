@@ -3,7 +3,6 @@
  * @author Ryszard Mleczko
  * @date Jan 2025
  * @brief A templated matrix class for general-purpose mathematical operations.
- * @tparam T The data type of the matrix elements (must be arithmetic or satisfy custom requirements).
  */
 
 
@@ -23,7 +22,7 @@ requires std::is_arithmetic_v<T>
 class Matrix {
 private:
     /** Number of rows */
-    int m_row;
+    int m_rows;
     /** Number of columns */
     int m_cols;
     /** Data with which matrix is filled */
@@ -338,7 +337,7 @@ public:
      * @param numRows - the number of rows in the submatrix
      * @param numCols - the number of columns in the submatrix
      * @return A new Matrix object representing the submatrix
-    */
+     */
     Matrix subMatrix(int startRow, int startCol, int numRows, int numCols) const {
         if (startRow < 0 || startCol < 0 || startRow + numRows > m_rows || startCol + numCols > m_cols) {
             throw std::out_of_range("Submatrix dimensions exceed matrix boundaries.");
@@ -357,7 +356,7 @@ public:
     /** 
      * @brief Multiplies Matrix by a scalar
      * @param scalar - number by which every element is being multiplied
-    */
+     */
     void scale(T scalar) {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
@@ -384,7 +383,7 @@ public:
 
     /**
      * @brief Transposes the matrix in place, modifying the original matrix 
-    */
+     */
     void selfTranspose() {
         T** newData = new T*[m_cols];
         for (int i = 0; i < m_cols; ++i) {
@@ -410,7 +409,7 @@ public:
      * @brief Adds a new row to the matrix at the specified position
      * @param position - the index at which to add the new row
      * @param newRow - the new row to be added, provided as an initializer list 
-    */
+     */
     void addRow(int position, std::initializer_list<T> newRow) {
         if (position < 0 || position > m_rows) {
             throw std::out_of_range("Invalid row position.");
@@ -458,7 +457,7 @@ public:
      * @brief Adds a new column to the matrix at the specified position
      * @param position - the index at which to add the new column
      * @param newCol - the new column to be added, provided as an initializer list 
-    */
+     */
     void addCol(int position, std::initializer_list<T> newCol) {
         if (position < 0 || position > m_cols) {
             throw std::out_of_range("Invalid column position.");
@@ -502,7 +501,7 @@ public:
     /**
      * @brief Removes a row from the matrix at the specified position
      * @param rowIndex - the index at which to remove the row 
-    */
+     */
     void removeRow(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= m_rows) {
             throw std::out_of_range("Invalid row index.");
@@ -524,7 +523,7 @@ public:
     /**
      * @brief Removes a columne from the matrix at the specified position
      * @param colIndex - the index at which to remove the column
-    */
+     */
     void removeColumn(int colIndex) {
         if (colIndex < 0 || colIndex >= m_cols) {
             throw std::out_of_range("Invalid column index");
@@ -549,7 +548,7 @@ public:
 
     /**
      * @brief Rotates matrix by 90 degrees clockwise 
-    */
+     */
     Matrix rotate90() const {
         Matrix result(m_cols, m_rows);
 
@@ -564,14 +563,14 @@ public:
 
     /**
      * @brief Rotates matrix by 180 degrees clockwise 
-    */
+     */
     Matrix rotate180() const {
         return this->rotate90().rotate90();
     }
 
     /**
      * @brief Rotates matrix by 270 degrees clockwise 
-    */
+     */
     Matrix rotate270() const {
         return this->rotate180().rotate90();
     }
@@ -584,7 +583,7 @@ public:
      * @brief Adds two matrices element-wise
      * @param other - the matrix to add to the current matrix
      * @return A new Matrix object representing the sum of the two matrices
-    */
+     */
     Matrix operator+(const Matrix& other) const {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -605,7 +604,7 @@ public:
      * @brief Adds a scalar value to each element of the matrix
      * @param other - the scalar value to be added to each element
      * @return A new Matrix object with the scalar added to each element
-    */
+     */
     Matrix operator+(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -623,7 +622,7 @@ public:
      * @brief Adds another matrix to the current matrix element-wise
      * @param other - the matrix to add to the current matrix
      * @return A reference to the current matrix after addition
-    */
+     */
     Matrix& operator+=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -659,7 +658,7 @@ public:
      * @brief Subtracts two matrices element-wise
      * @param other - the matrix to subtract from the current matrix
      * @return A new Matrix object representing the subtraction of the two matrices
-    */
+     */
     Matrix operator-(const Matrix& other) const {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -680,7 +679,7 @@ public:
      * @brief Subtracts a scalar value from each element of the matrix
      * @param other - the scalar value to be subtracted from each element
      * @return A new Matrix object with the scalar subtracted from each element
-    */
+     */
     Matrix operator-(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -698,7 +697,7 @@ public:
      * @brief Adds another matrix to the current matrix element-wise
      * @param other - the matrix to add to the current matrix
      * @return A reference to the current matrix after addition   
-    */
+     */
     Matrix& operator-=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -717,7 +716,7 @@ public:
      * @brief Adds a scalar value to each element of the current matrix
      * @param other - the scalar value to be added to each element
      * @return A reference to the current matrix after addition
-    */
+     */
     Matrix& operator-=(const T other) {
 
         for (int i = 0; i < m_rows; ++i) {
