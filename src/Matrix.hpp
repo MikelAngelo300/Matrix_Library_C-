@@ -1,23 +1,9 @@
 /**
  * @file Matrix.hpp
+ * @author Ryszard Mleczko
+ * @date Jan 2025
  * @brief A templated matrix class for general-purpose mathematical operations.
- *
- * This header file defines a generic `Matrix` class that supports arithmetic types (and custom types 
- * that meet certain requirements). The class provides a variety of matrix operations, including:
- * 
- * - Basic arithmetic operations (+, -, *, scalar operations)
- * - Accessors and mutators for elements, rows, and columns
- * - Matrix resizing, transposition, and rotation
- * - Initialization and filling methods (e.g., zeros, ones, random values)
- * - Statistical operations (e.g., sum, mean, min, max)
- * - Normalization and submatrix extraction
- * 
- * The class ensures safety through bounds checking and supports additional functionality like 
- * Gaussian random filling and row/column insertion or deletion.
- * 
  * @tparam T The data type of the matrix elements (must be arithmetic or satisfy custom requirements).
- * 
- * @note Users must manage the header file `ComplexNumber.hpp` dependency for complex number support.
  */
 
 
@@ -30,14 +16,27 @@
 namespace rm {
 template <typename T>
 requires std::is_arithmetic_v<T>
+/**
+ * @class Matrix
+ * @brief Represents a Matrix with various methods
+ */
 class Matrix {
 private:
-    int m_rows, m_cols;
+    /** Number of rows */
+    int m_row;
+    /** Number of columns */
+    int m_cols;
+    /** Data with which matrix is filled */
     T** m_data;
 
 public:
 
-    // Constructor wiht initial value
+    /**
+     * @brief Parametric constructor of Matrix with default value
+     * @param rows - number of rows with which Matrix is initialized
+     * @param cols - number of columns with which Matrix is initialized
+     * @param initValue - default value with which Matrix is initialized
+     */
     Matrix(int rows, int cols, T initValue = T())
         : m_rows(rows), m_cols(cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -53,7 +52,12 @@ public:
         }
     }
 
-    //Contructor with initializer list
+    /**
+     * @brief Parametric constructor of Matrix with initializer list
+     * @param rows - number of rows with which Matrix is initialized
+     * @param cols - number of columns with which Matrix is initialized
+     * @param values - values with which Matrix is initialized
+     */
     Matrix(int rows, int cols, std::initializer_list<std::initializer_list<T>> values)
         : m_rows(rows), m_cols(cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -75,7 +79,10 @@ public:
         }
     }
 
-    //Copy constructor
+    /**
+     * @brief Copy constructor of Matrix
+     * @param other - Matrix of which is copy being made of 
+     */
     Matrix(const Matrix& other)
         : m_rows(other.m_rows), m_cols(other.m_cols) {
         if (m_rows <= 0 || m_cols <= 0) {
@@ -90,7 +97,9 @@ public:
         }
     }
 
-    // Destructor
+    /**
+     * @brief Default destructor 
+     */
     ~Matrix() {
         for (int i = 0; i < m_rows; ++i) {
             delete[] m_data[i];
@@ -98,16 +107,32 @@ public:
         delete[] m_data;
     }
 
-    // Getter for number of rows
+    /**
+     * Getters
+     */
+
+    /**
+     * @brief Gets number of rows
+     * @return number of rows
+     */
     int getRows() const { return m_rows; }
 
-    // Getter for number of columns
+    /**
+     * @brief Gets number of columns
+     * @return number of cloumns
+     */
     int getCols() const { return m_cols; }
 
-    // Getter for data
+    /**
+     * @brief Gets all data
+     * @return data
+     */
     T** getData() const { return m_data; }
 
-    // Getter for specific value
+    /**
+     * @brief Gets data from a specific location
+     * @return data from specific location
+     */
     T getVal(int i, int j) const {
         if (i < 0 || i >= m_rows || j < 0 || j >= m_cols) {
             throw std::out_of_range("Matrix indices are out of range.");
@@ -115,7 +140,24 @@ public:
         return m_data[i][j];
     }
 
-    // Setter for specific value
+    /**
+     * @brief Gets size of matrix in pair <rows,cols>
+     * @return size of matrix
+     */
+    std::pair<int, int> getSize() const {
+        return {m_rows, m_cols};
+    }
+
+    /**
+     * Setters
+     */
+
+    /**
+     * @brief Sets value at specific location
+     * @param i - row number 
+     * @param j - column number
+     * @param newVal - new Value that is being set 
+     */
     void setVal(int i, int j, T newVal) {
         if (i < 0 || i >= m_rows || j < 0 || j >= m_cols) {
             throw std::out_of_range("Matrix indices are out of range.");
@@ -123,7 +165,14 @@ public:
         m_data[i][j] = newVal;
     }
 
-    // Fill entire matrix with a specific value
+    /**
+     * Fillers
+     */
+
+    /**
+     * @brief Fill entire matrix with a specific value
+     * @param value - value that is being set into every location 
+     */
     virtual void fill(T value) {
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
@@ -132,7 +181,25 @@ public:
         }
     }
 
-    // Fill with random values within a specified range
+    /**
+     * @brief Fill entire matrix with zeros 
+     */
+    virtual void zeros() {
+        this->fill(0);
+    }
+
+    /**
+     * @brief Fill entire matrix with ones 
+     */
+    virtual void ones() {
+        this->fill(1);
+    }
+
+    /**
+     * @brief Fill with random values within a specified range
+     * @param min - minimal range value 
+     * @param max - maximal range value
+     */
     virtual void randomFill(int min, int max) {
         if (min > max) {
             throw std::invalid_argument("min cannot be greater than max.");
@@ -151,7 +218,11 @@ public:
         }
     }
 
-    //Fill the matrix with Gaussian distribution numbers numbers 
+    /**
+     * @brief Fill the matrix with Gaussian distribution numbers numbers
+     * @param mean - mean of the Gaussian distribution
+     * @param stddev - standard deviation of the Gaussian distribution
+     */
     virtual void randomFillGaussian(T mean, T stddev) {
         static_assert(std::is_floating_point<T>::value, "T must be a floating-point type.");
         std::random_device rd;
@@ -166,17 +237,14 @@ public:
         }
     }
 
-    //Fill the matrix with 0
-    virtual void zeros() {
-        this->fill(0);
-    }
+    /**
+     * Arithmetic methods
+     */
 
-    //Fill the matrix with 1
-    virtual void ones() {
-        this->fill(1);
-    }
-
-    //Calculate sum of every element in matrix
+    /**
+     * @brief Calculates sum of every element in Matrix
+     * @return sum
+     */
     T sum() const {
         T sum=0;
         for (int i = 0; i < m_rows; ++i) {
@@ -187,12 +255,18 @@ public:
         return sum;
     }
 
-    //Calculate mean value of every element in matrix
+    /**
+     * @brief Calculates mean value of every element in Matrix
+     * @return mean value
+     */
     T mean() const {
         return (this->sum()/(m_cols*m_rows));
     }
 
-    //Find minimal value in matrix
+    /**
+     * @brief Finds element with minimal value in Matrix
+     * @return minimal value
+     */
     T min() const {
         if (m_rows == 0 || m_cols == 0) {
             throw std::runtime_error("Matrix is empty, cannot determine the minimum value.");
@@ -210,7 +284,10 @@ public:
         return buf;
     }
 
-    //Find maximal value in matrix
+    /**
+     * @brief Finds element with maximal value in Matrix
+     * @return maximal value
+     */
     T max() const {
         if (m_rows == 0 || m_cols == 0) {
             throw std::runtime_error("Matrix is empty, cannot determine the minimum value.");
@@ -228,7 +305,9 @@ public:
         return buf;
     }
 
-    //Normalize matrix (rescale it with numbers between 0 and 1)
+    /**
+     * @brief Normalizes Matrix (rescales it with numbers between 0 and 1)
+     */
     void normalize() const { 
         T minValue = this->min();
         T maxValue = this->max();
@@ -248,13 +327,18 @@ public:
         }
     }
 
+    /**
+     * Matrix specific methods
+     */
 
-    //returns size of matrix in pair <rows,cols>
-    std::pair<int, int> size() const {
-        return {m_rows, m_cols};
-    }
-
-    //Extracts submatrix  
+    /** 
+     * @brief Extracts a submatrix from the current matrix
+     * @param startRow - the starting row index of the submatrix
+     * @param startCol - the starting column index of the submatrix
+     * @param numRows - the number of rows in the submatrix
+     * @param numCols - the number of columns in the submatrix
+     * @return A new Matrix object representing the submatrix
+    */
     Matrix subMatrix(int startRow, int startCol, int numRows, int numCols) const {
         if (startRow < 0 || startCol < 0 || startRow + numRows > m_rows || startCol + numCols > m_cols) {
             throw std::out_of_range("Submatrix dimensions exceed matrix boundaries.");
@@ -270,7 +354,63 @@ public:
         return result;
     }
 
-    //Adds row to the matrix
+    /** 
+     * @brief Multiplies Matrix by a scalar
+     * @param scalar - number by which every element is being multiplied
+    */
+    void scale(T scalar) {
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] *= scalar;
+            }
+        }
+    }
+
+    /** 
+     * @brief Transposes the current matrix 
+     * @return A new Matrix object representing the transposed matrix
+     */
+    Matrix transpose() const {
+        Matrix<T> transposed(m_cols, m_rows); 
+
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
+                transposed.m_data[j][i] = m_data[i][j];
+            }
+        }
+
+        return transposed;
+    }
+
+    /**
+     * @brief Transposes the matrix in place, modifying the original matrix 
+    */
+    void selfTranspose() {
+        T** newData = new T*[m_cols];
+        for (int i = 0; i < m_cols; ++i) {
+            newData[i] = new T[m_rows];
+            for (int j = 0; j < m_rows; ++j) {
+                newData[i][j] = m_data[j][i];
+            }
+        }
+
+        for (int i = 0; i < m_rows; ++i) {
+            delete[] m_data[i];
+        }
+        delete[] m_data;
+        std::swap(m_rows, m_cols);
+        m_data = newData;
+    }
+
+    /**
+     * Size manipulation methods
+     */
+    
+    /**
+     * @brief Adds a new row to the matrix at the specified position
+     * @param position - the index at which to add the new row
+     * @param newRow - the new row to be added, provided as an initializer list 
+    */
     void addRow(int position, std::initializer_list<T> newRow) {
         if (position < 0 || position > m_rows) {
             throw std::out_of_range("Invalid row position.");
@@ -314,7 +454,11 @@ public:
         ++m_rows; 
     }
 
-    //Adds column to the matrix
+    /**
+     * @brief Adds a new column to the matrix at the specified position
+     * @param position - the index at which to add the new column
+     * @param newCol - the new column to be added, provided as an initializer list 
+    */
     void addCol(int position, std::initializer_list<T> newCol) {
         if (position < 0 || position > m_cols) {
             throw std::out_of_range("Invalid column position.");
@@ -355,7 +499,10 @@ public:
         ++m_cols;
     }
 
-    //Removes row from the matrix
+    /**
+     * @brief Removes a row from the matrix at the specified position
+     * @param rowIndex - the index at which to remove the row 
+    */
     void removeRow(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= m_rows) {
             throw std::out_of_range("Invalid row index.");
@@ -374,7 +521,10 @@ public:
         --m_rows;
     }
 
-    //Removes column form the matrix
+    /**
+     * @brief Removes a columne from the matrix at the specified position
+     * @param colIndex - the index at which to remove the column
+    */
     void removeColumn(int colIndex) {
         if (colIndex < 0 || colIndex >= m_cols) {
             throw std::out_of_range("Invalid column index");
@@ -393,47 +543,13 @@ public:
         --m_cols;
     }
 
-    //Multiplies matrix by a scalar
-    void scale(T scalar) {
-        for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < m_cols; ++j) {
-                m_data[i][j] *= scalar;
-            }
-        }
-    }
+    /**
+     * Matrix rotations
+     */
 
-    // Transposes a matrix
-    Matrix transpose() const {
-        Matrix<T> transposed(m_cols, m_rows); 
-
-        for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < m_cols; ++j) {
-                transposed.m_data[j][i] = m_data[i][j];
-            }
-        }
-
-        return transposed;
-    }
-
-    // Transposes a matrix to the same one
-    void selfTranspose() {
-        T** newData = new T*[m_cols];
-        for (int i = 0; i < m_cols; ++i) {
-            newData[i] = new T[m_rows];
-            for (int j = 0; j < m_rows; ++j) {
-                newData[i][j] = m_data[j][i];
-            }
-        }
-
-        for (int i = 0; i < m_rows; ++i) {
-            delete[] m_data[i];
-        }
-        delete[] m_data;
-        std::swap(m_rows, m_cols);
-        m_data = newData;
-    }
-    
-    //Rotates matrix by 90 degrees clockwise
+    /**
+     * @brief Rotates matrix by 90 degrees clockwise 
+    */
     Matrix rotate90() const {
         Matrix result(m_cols, m_rows);
 
@@ -445,17 +561,30 @@ public:
 
         return result;
     }
-    // Rotates matrix by 180 degrees clockwise
+
+    /**
+     * @brief Rotates matrix by 180 degrees clockwise 
+    */
     Matrix rotate180() const {
         return this->rotate90().rotate90();
     }
 
-    // Rotates matrix 270 degrees clockwise
+    /**
+     * @brief Rotates matrix by 270 degrees clockwise 
+    */
     Matrix rotate270() const {
         return this->rotate180().rotate90();
     }
 
-    // Matrix addition
+    /**
+     * Operators
+     */
+    
+    /** 
+     * @brief Adds two matrices element-wise
+     * @param other - the matrix to add to the current matrix
+     * @return A new Matrix object representing the sum of the two matrices
+    */
     Matrix operator+(const Matrix& other) const {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -472,7 +601,11 @@ public:
         return result;
     }
 
-    //Matrix addition element wise
+    /**
+     * @brief Adds a scalar value to each element of the matrix
+     * @param other - the scalar value to be added to each element
+     * @return A new Matrix object with the scalar added to each element
+    */
     Matrix operator+(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -486,7 +619,11 @@ public:
         return result;
     }
 
-    // Matrix addition assignment
+    /** 
+     * @brief Adds another matrix to the current matrix element-wise
+     * @param other - the matrix to add to the current matrix
+     * @return A reference to the current matrix after addition
+    */
     Matrix& operator+=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -501,7 +638,11 @@ public:
         return *this;
     }
 
-    // Matrix addition assignment element wise
+  /**
+    * @brief Adds a scalar value to each element of the current matrix
+    * @param other - the scalar value to be added to each element
+    * @return A reference to the current matrix after addition
+    */
     Matrix& operator+=(const T other) {
 
         for (int i = 0; i < m_rows; ++i) {
@@ -514,7 +655,11 @@ public:
     
     }
 
-    // Matrix subtraction
+    /** 
+     * @brief Subtracts two matrices element-wise
+     * @param other - the matrix to subtract from the current matrix
+     * @return A new Matrix object representing the subtraction of the two matrices
+    */
     Matrix operator-(const Matrix& other) const {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -531,7 +676,11 @@ public:
         return result;
     }
 
-    // Matrix substraction element wise
+    /**
+     * @brief Subtracts a scalar value from each element of the matrix
+     * @param other - the scalar value to be subtracted from each element
+     * @return A new Matrix object with the scalar subtracted from each element
+    */
     Matrix operator-(const T other) const {
         
         Matrix result(m_rows, m_cols);
@@ -545,7 +694,11 @@ public:
         return result;
     }
 
-    // Matrix subtraction assignment
+    /**
+     * @brief Adds another matrix to the current matrix element-wise
+     * @param other - the matrix to add to the current matrix
+     * @return A reference to the current matrix after addition   
+    */
     Matrix& operator-=(const Matrix& other) {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             throw std::invalid_argument("Matrix dimensions must be equal.");
@@ -560,7 +713,11 @@ public:
         return *this;
     }
 
-    // Matrix subtraction assignment element wise
+    /**
+     * @brief Adds a scalar value to each element of the current matrix
+     * @param other - the scalar value to be added to each element
+     * @return A reference to the current matrix after addition
+    */
     Matrix& operator-=(const T other) {
 
         for (int i = 0; i < m_rows; ++i) {
@@ -570,10 +727,14 @@ public:
         }
 
         return *this;
-    
     }
 
-    // Matrix multiplication
+    /**
+     * @brief Multiplies the current matrix with another matrix
+     * @param other - the matrix to multiply with
+     * @return A new Matrix object representing the product of the two matrices
+     * @throws std::invalid_argument if the dimensions do not allow multiplication
+     */
     Matrix operator*(const Matrix& other) const {
         if (m_cols != other.m_rows) {
             throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
@@ -594,13 +755,16 @@ public:
         return result;
     }
 
-    // Matrix multiplication element wise
+    /**
+     * @brief Multiplies each element of the matrix by a scalar value
+     * @param other - the scalar value to multiply by
+     * @return A new Matrix object with each element multiplied by the scalar
+     */
     Matrix operator*(const T other) const {
-        
-        Matrix result(m_rows, other.m_cols);
+        Matrix result(m_rows, m_cols);
 
         for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < other.m_cols; ++j) {
+            for (int j = 0; j < m_cols; ++j) {
                 result.m_data[i][j] = m_data[i][j] * other;
             }
         }
@@ -608,7 +772,12 @@ public:
         return result;
     }
 
-    // Matrix multiplication assignment
+    /**
+     * @brief Multiplies the current matrix with another matrix and assigns the result to the current matrix
+     * @param other - the matrix to multiply with
+     * @return A reference to the current matrix after multiplication
+     * @throws std::invalid_argument if the dimensions do not allow multiplication
+     */
     Matrix& operator*=(const Matrix& other) {
         if (m_cols != other.m_rows) {
             throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
@@ -631,29 +800,31 @@ public:
         return *this;
     }
 
-    // Matrix multiplication assignment element wise
+    /**
+     * @brief Multiplies each element of the current matrix by a scalar value and assigns the result to the current matrix
+     * @param other - the scalar value to multiply by
+     * @return A reference to the current matrix after multiplication
+     */
     Matrix& operator*=(const T other) {
-        
-        Matrix result(m_rows, other.m_cols);
-
         for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < other.m_cols; ++j) {
-                result.m_data[i][j] = m_data[i][j] * other;
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] *= other;
             }
         }
-
-        *this = result;
 
         return *this;
     }
 
-    // Matrix division element wise
+    /**
+     * @brief Divides each element of the matrix by a scalar value
+     * @param other - the scalar value to divide by
+     * @return A new Matrix object with each element divided by the scalar
+     */
     Matrix operator/(const T other) const {
-        
-        Matrix result(m_rows, other.m_cols);
+        Matrix result(m_rows, m_cols);
 
         for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < other.m_cols; ++j) {
+            for (int j = 0; j < m_cols; ++j) {
                 result.m_data[i][j] = m_data[i][j] / other;
             }
         }
@@ -661,23 +832,26 @@ public:
         return result;
     }
 
-    // Matrix division assignment elemnt wise
+    /**
+     * @brief Divides each element of the current matrix by a scalar value and assigns the result to the current matrix
+     * @param other - the scalar value to divide by
+     * @return A reference to the current matrix after division
+     */
     Matrix& operator/=(const T other) {
-        
-        Matrix result(m_rows, other.m_cols);
-
         for (int i = 0; i < m_rows; ++i) {
-            for (int j = 0; j < other.m_cols; ++j) {
-                result.m_data[i][j] = m_data[i][j] / other;
+            for (int j = 0; j < m_cols; ++j) {
+                m_data[i][j] /= other;
             }
         }
-
-        *this = result;
 
         return *this;
     }
 
-    // Assignment operator
+    /**
+     * @brief Assigns the values from another matrix to the current matrix
+     * @param other - the matrix to assign from
+     * @return A reference to the current matrix after assignment
+     */
     Matrix& operator=(const Matrix& other) {
         if (this != &other) {
             // Deallocate existing memory
@@ -699,7 +873,11 @@ public:
         return *this;
     }
 
-    // Equality operator
+    /**
+     * @brief Checks if two matrices are equal
+     * @param other - the matrix to compare with
+     * @return True if the matrices are equal, false otherwise
+     */
     bool operator==(const Matrix& other) const {
         if (m_rows != other.m_rows || m_cols != other.m_cols) {
             return false;
@@ -715,17 +893,24 @@ public:
         return true;
     }
 
-    // Inequality operator
+    /**
+     * @brief Checks if two matrices are not equal
+     * @param other - the matrix to compare with
+     * @return True if the matrices are not equal, false otherwise
+     */
     bool operator!=(const Matrix& other) const {
         return !(*this == other);
     }
 
-
-    // Override of th "<<" operator
+    /**
+     * @brief Outputs the matrix elements to a stream
+     * @param os - the output stream
+     * @param M - the matrix to output
+     * @return The output stream with the matrix elements
+     */
     template<typename U>
     friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& M);
 };
-
 // Stream output implementation
 template<typename U>
 std::ostream& operator<<(std::ostream& os, const Matrix<U>& M) {
@@ -737,4 +922,5 @@ std::ostream& operator<<(std::ostream& os, const Matrix<U>& M) {
     }
     return os;
 }
-};
+}
+
